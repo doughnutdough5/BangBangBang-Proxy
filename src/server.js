@@ -10,7 +10,7 @@ const SERVERS = {
 const proxyServer = net.createServer((clientSocket) => {
   console.log(`클라이언트가 연결됨: ${clientSocket.remoteAddress}`);
 
-  let targetServer = null;      // 현재 연결된 대상 서버
+  let targetServer = null;        // 현재 연결된 대상 서버
   let currentServerSocket = null; // 현재 대상 서버의 소켓
   let buffer = Buffer.alloc(0);
 
@@ -44,7 +44,7 @@ const proxyServer = net.createServer((clientSocket) => {
       currentServerSocket = net.connect(targetServer.port, targetServer.host, () => {
         console.log('타겟 서버에 연결되었습니다');
 
-        currentServerSocket.write(data);
+        currentServerSocket.write(buffer);
 
         clientSocket.pipe(currentServerSocket);
         currentServerSocket.pipe(clientSocket);
@@ -53,12 +53,12 @@ const proxyServer = net.createServer((clientSocket) => {
       });
 
       currentServerSocket.on('error', (err) => {
-        console.error(`대상 서버 연결 오류: ${err.message}`);
-        clientSocket.end('대상 서버 연결 실패');
+        console.error(`타겟 서버 연결 오류: ${err.message}`);
+        clientSocket.end('타켓 서버 연결 실패');
       });
 
       currentServerSocket.on('close', () => {
-        console.log('대상 서버 소켓 종료');
+        console.log('타겟 서버 소켓 종료');
         targetServer = null;
       });
 
@@ -69,9 +69,6 @@ const proxyServer = net.createServer((clientSocket) => {
       clientSocket.on('close', () => {
         console.log('클라이언트 연결 종료');
       });
-    } else {
-      // 대상 서버가 변경되지 않았으면 데이터를 그대로 전달
-      currentServerSocket.write(data);
     }
   });
 });
